@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Friend Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  text-align:center;
+  background:linear-gradient(45deg,#ff758c,#ff7eb3,#ffb199);
+  overflow-y:auto;
+  color:white;
+}
+
+/* PAGE */
+.page{
+  display:none;
+  min-height:100vh;
+  justify-content:flex-start;
+  align-items:center;
+  flex-direction:column;
+  padding:20px;
+  overflow-y:auto;
+}
+
+.active{
+  display:flex;
+}
+
+/* PHOTO */
+.photo{
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  border:6px solid white;
+  object-fit:cover;
+  animation: floatPhoto 3s ease-in-out infinite;
+}
+
+/* PHOTO FLOAT ANIMATION */
+@keyframes floatPhoto {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+}
+
+/* BUTTON */
+button{
+  padding:12px 20px;
+  margin:10px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+button:active{
+  transform: scale(0.9);
+}
+
+/* BUTTON COLORS */
+.play{background:red;color:white;font-weight:bold}
+.surprise{background:purple;color:white;font-weight:bold}
+.message{background:green;color:white;font-weight:bold}
+.yes{background:#00c853;color:white;font-weight:bold}
+.no{background:#d50000;color:white;font-weight:bold}
+
+/* QUESTIONS */
+.question{
+  margin:15px;
+  font-size:22px;
+}
+
+.answer{
+  font-size:18px;
+  margin-top:5px;
+  color:#fff;
+}
+
+/* HEART + LEAF */
+.heart,.leaf{
+  position:fixed;
+  top:-10px;
+  font-size:20px;
+  animation:fall linear infinite;
+}
+
+@keyframes fall{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(100vh)}
+}
+
+/* YES MOVE GAME */
+#yesMove{
+  position:relative;
+}
+
+/* FUN GAME CENTER */
+#fun{
+  justify-content:center;
+}
+#fun .photo{
+  margin-bottom:20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HOME -->
+<div id="home" class="page active">
+<h1>Hayy My Dear Best Friend ❤️</h1>
+<hr><hr><hr><hr><hr>
+<img class="photo" src="elai.jpg">
+<hr><hr><hr><hr>
+<div>
+  <button class="play" onclick="showPage('game')">🎮 Play Love Game</button>
+  <button class="surprise" onclick="surprise()">💖 Surprise</button>
+  <button class="message" onclick="message()">💌 Message</button>
+</div>
+<div id="homeMsg"></div>
+</div>
+
+<!-- QUESTIONS -->
+<div id="game" class="page">
+<h2>My Questions ❤️</h2>
+<div class="question">
+1. Unakku ennai ya evlo pudikkum?
+<br>
+<select id="percent">
+<option>0%</option>
+<option>20%</option>
+<option>40%</option>
+<option>60%</option>
+<option>80%</option>
+<option>90%</option>
+<option>100%</option>
+<option>Billiyan %</option>
+</select>
+</div>
+
+<div class="question">
+
+
+<div class="question">
+ 2. Ennodu pesa virumburingala?✅
+<br>
+<button class="yes" onclick="answer('a2','Yes','ans2')">Yes</button>
+<button class="no" onclick="answer('a2','No','ans2')">No</button>
+<div id="ans2" class="answer"></div>
+
+</div>
+3. Unnai ya"dii" nu koopdalaama?
+<br>
+<button class="yes" onclick="answer('a1','Yes','ans1')">Yes</button>
+<button class="no" onclick="answer('a1','No','ans1')">No</button>
+<div id="ans1" class="answer"></div>
+</div>
+
+<div class="question">
+4. Am I special for you?
+<br>
+<button class="yes" onclick="answer('a3','Yes','ans3')">Yes</button>
+<button class="no" onclick="answer('a3','No','ans3')">No</button>
+<div id="ans3" class="answer"></div>
+</div>
+
+<div class="question">
+5. Will you remember me always?
+<br>
+<button class="yes" onclick="answer('a4','Yes','ans4')">Yes</button>
+<button class="no" onclick="answer('a4','No','ans4')">No</button>
+<div id="ans4" class="answer"></div>
+</div>
+
+<div class="question">
+6. Can I always message you?
+<br>
+<button class="yes" onclick="answer('a5','Yes','ans5')">Yes</button>
+<button class="no" onclick="answer('a5','No','ans5')">No</button>
+<div id="ans5" class="answer"></div>
+</div>
+
+<button class="play" onclick="submitGame()">Submit</button>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="page">
+<hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr>
+<h2>Your Answers ❤️</h2>
+<div id="resultText"></div>
+<button class="message" onclick="sendMail()">Send Email</button>
+<br><br>
+<button class="play" onclick="showPage('fun')">Play Fun Game🎮</button>
+</div>
+
+<!-- FUN GAME -->
+<div id="fun" class="page">
+<h2>Are you in love with me? 😍</h2>
+<button id="yesMove" class="yes">YES ❤️</button>
+<button class="no" onclick="noClick()">NO 💔</button>
+<div id="funMsg"></div>
+</div>
+
+<script>
+let answers={}
+
+function showPage(p){
+  document.querySelectorAll(".page").forEach(x=>{ x.classList.remove("active") })
+  document.getElementById(p).classList.add("active")
+}
+
+/* ANSWER */
+function answer(q,a,id){
+  answers[q]=a
+  document.getElementById(id).innerHTML="You selected : "+a
+}
+
+/* SUBMIT */
+function submitGame(){
+  let p=document.getElementById("percent").value
+  let text=`Love % : ${p}<br>
+Q1 : ${answers.a1}<br>
+Q2 : ${answers.a2}<br>
+Q3 : ${answers.a3}<br>
+Q4 : ${answers.a4}<br>
+Q5 : ${answers.a5}`
+  document.getElementById("resultText").innerHTML=text
+  showPage("result")
+}
+
+/* EMAIL */
+function sendMail(){
+  let body=document.getElementById("resultText").innerText
+  window.location.href=
+  "mailto:sanjaisanjaii2006@gmail.com?subject=Love Game Answer&body="+body
+}
+
+/* SURPRISE */
+function surprise(){
+  document.getElementById("homeMsg").innerHTML=
+  "🎉 Surprise! You are the most special person in my life ❤️"
+}
+
+/* MESSAGE */
+function message(){
+  document.getElementById("homeMsg").innerHTML=
+   "Hayy My Dear Elamathi! 💌 Thank you for being my best friend ❤️"
+
+}
+
+/* FUN GAME */
+let yes=document.getElementById("yesMove")
+yes.addEventListener("mouseover",()=>{
+  yes.style.left=Math.random()*200-100+"px"
+  yes.style.top=Math.random()*200-100+"px"
+})
+
+function noClick(){
+  document.getElementById("funMsg").innerHTML=
+  "😢 Oh no! But I still like you ❤️"
+}
+
+/* HEART + LEAF */
+function rain(){
+  let heart=document.createElement("div")
+  heart.className="heart"
+  heart.innerHTML="💖"
+  heart.style.left=Math.random()*100+"vw"
+  heart.style.animationDuration=(Math.random()*3+2)+"s"
+  document.body.appendChild(heart)
+  setTimeout(()=>heart.remove(),5000)
+
+  let leaf=document.createElement("div")
+  leaf.className="leaf"
+  leaf.innerHTML="🍃"
+  leaf.style.left=Math.random()*100+"vw"
+  leaf.style.animationDuration=(Math.random()*4+2)+"s"
+  document.body.appendChild(leaf)
+  setTimeout(()=>leaf.remove(),5000)
+}
+
+setInterval(rain,400)
+</script>
+</body>
+</html>
